@@ -4,10 +4,19 @@ var MONTH_ABBR = [
 ];
 
 document.addEventListener('click', function (e) {
-  var link = e.target.closest('#nav-home');
-  if (!link) return;
-  e.preventDefault();
-  showHomePanel();
+  var homeLink = e.target.closest('#nav-home');
+  if (homeLink) {
+    e.preventDefault();
+    showHomePanel();
+    return;
+  }
+  var submitLink = e.target.closest('#nav-submit-request');
+  if (submitLink) {
+    e.preventDefault();
+    var nav = document.querySelector('.site-nav');
+    if (nav) nav.classList.remove('open');
+    window.alert('feature coming soon!');
+  }
 });
 
 function showHomePanel() {

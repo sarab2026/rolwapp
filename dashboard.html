@@ -236,18 +236,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabaseClient.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/home.js?v=2"></script>
+  <script src="js/home.js?v=3"></script>
   <script src="js/calendar.js"></script>
   <script src="js/database.js"></script>
   <script src="js/weather.js"></script>
   <script>
     document.querySelector('.nav-toggle').addEventListener('click', function () {
       document.querySelector('.site-nav').classList.toggle('open');
-    });
-    document.getElementById('nav-submit-request').addEventListener('click', function (e) {
-      e.preventDefault();
-      document.querySelector('.site-nav').classList.remove('open');
-      alert('feature coming soon!');
     });
   </script>
 
