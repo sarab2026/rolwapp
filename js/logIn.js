@@ -1,9 +1,13 @@
 function passwordResetRedirectTo() {
   var configured = (window.ROLW_PASSWORD_RESET_REDIRECT_URL || '').trim();
-  if (configured) {
-    return configured;
+  var origin = window.location.origin;
+  if (window.location.hostname === 'rolw.app') {
+    origin = 'https://www.rolw.app';
   }
-  return window.location.origin + '/logIn.html';
+  var url = (configured || origin + '/reset-password.html').trim();
+  url = url.replace(/^[\s\u00a0\u200b]+|[\s\u00a0\u200b]+$/g, '');
+  url = url.replace(/^(https?:\/\/[^/?#]+)(?:%20|\s)+(?=\/|\?|#|$)/i, '$1');
+  return url;
 }
 
 document.querySelector('.signup-form').addEventListener('submit', async function (e) {
@@ -52,6 +56,10 @@ document.getElementById('forgot-password-link').addEventListener('click', async 
     return;
   }
 
+  try {
+    localStorage.setItem('rolw_pw_reset_started', String(Date.now()));
+  } catch (e) {}
+
   msgEl.textContent = 'Password reset link sent! Check your email.';
   msgEl.style.color = '#088395';
 });
@@ -85,6 +93,28 @@ document.getElementById('forgot-password-link').addEventListener('click', async 
     }
   });
 
+  var qs = window.location.search || '';
+  var hashRaw = (window.location.hash || '').replace(/^#/, '');
+  var hp = new URLSearchParams(hashRaw);
+  var typeRecovery = (hp.get('type') || '').toLowerCase() === 'recovery' || hashRaw.indexOf('type%3Drecovery') !== -1;
+
+  var resetStarted = null;
+  try {
+    resetStarted = localStorage.getItem('rolw_pw_reset_started');
+  } catch (e) {}
+
+  var codePresent = /[?&]code=/.test(qs);
+  var withinWindow = resetStarted && !isNaN(parseInt(resetStarted, 10)) && Date.now() - parseInt(resetStarted, 10) < 24 * 60 * 60 * 1000;
+
+  if (typeRecovery) {
+    showRecoveryUI();
+  } else if (codePresent && withinWindow) {
+    try {
+      localStorage.removeItem('rolw_pw_reset_started');
+    } catch (e) {}
+    showRecoveryUI();
+  }
+
   saveBtn.addEventListener('click', async function () {
     recoveryError.textContent = '';
     var a = newPw.value;
@@ -102,6 +132,9 @@ document.getElementById('forgot-password-link').addEventListener('click', async 
       recoveryError.textContent = error.message;
       return;
     }
+    try {
+      localStorage.removeItem('rolw_pw_reset_started');
+    } catch (e) {}
     window.location.replace('dashboard.html');
   });
 })();

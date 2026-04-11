@@ -2,52 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>
+    (function () {
+      if (location.hostname === 'rolw.app') {
+        location.replace('https://www.rolw.app' + location.pathname + location.search + location.hash);
+        return;
+      }
+
+      var s = window.location.search || '';
+      var h = window.location.hash || '';
+      var combined = s + h;
+
+      function wwwBase() {
+        return location.hostname === 'www.rolw.app' ? 'https://www.rolw.app/' : '';
+      }
+
+      function go(path) {
+        location.replace(wwwBase() + path + s + h);
+      }
+
+      var frag = h.replace(/^#/, '');
+      var q = s.indexOf('?') === 0 ? s.slice(1) : s;
+      var sp = new URLSearchParams(q);
+      var hp = new URLSearchParams(frag);
+
+      var typeRecovery = (sp.get('type') || hp.get('type') || '').toLowerCase() === 'recovery'
+        || combined.indexOf('type%3Drecovery') !== -1;
+
+      if (typeRecovery) {
+        go('reset-password.html');
+        return;
+      }
+
+      var hasCode = /(?:^|[?&#])code=/.test(combined);
+
+      var resetStarted = false;
+      try {
+        var ts = localStorage.getItem('rolw_pw_reset_started');
+        resetStarted = ts && !isNaN(parseInt(ts, 10)) && Date.now() - parseInt(ts, 10) < 24 * 60 * 60 * 1000;
+      } catch (e) {}
+
+      if (hasCode) {
+        if (resetStarted) {
+          go('reset-password.html');
+        } else {
+          go('logIn.html');
+        }
+        return;
+      }
+
+      if (frag.indexOf('access_token=') !== -1) {
+        go('logIn.html');
+        return;
+      }
+
+      if (/[?&]error=/.test(s)) {
+        go('logIn.html');
+        return;
+      }
+
+      location.replace(wwwBase() + 'sign-up.html');
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="ROLW Church - Sign Up">
-  <title>ROLW Church - Sign Up</title>
+  <title>ROLW Church</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-
-  <div class="signup-page">
-
-    <div class="signup-card">
-      <h1>ROLW Dashboard</h1>
-      <p>Create your account to get started.</p>
-
-      <form class="signup-form" action="#" method="post">
-        <div class="form-group">
-          <label for="first-name">First Name</label>
-          <input type="text" id="first-name" name="first-name" required>
-        </div>
-
-        <div class="form-group">
-          <label for="last-name">Last Name</label>
-          <input type="text" id="last-name" name="last-name" required>
-        </div>
-
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required>
-        </div>
-
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" required>
-        </div>
-
-        <button type="submit" class="btn-signup">Sign Up</button>
-      </form>
-
-      <p id="form-error" class="form-error"></p>
-      <p class="signup-login-link">Already have an account? <a href="logIn.html">Log in</a></p>
-    </div>
-
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabaseClient.js"></script>
-  <script src="js/signUp.js"></script>
-
+  <noscript>
+    <p class="signup-page" style="padding:2rem;font-family:system-ui,sans-serif"><a href="https://www.rolw.app/sign-up.html">Sign up</a> · <a href="https://www.rolw.app/logIn.html">Log in</a></p>
+  </noscript>
 </body>
 </html>

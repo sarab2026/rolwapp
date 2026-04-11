@@ -1,3 +1,11 @@
 {
-  "rewrites": [{ "source": "/", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/", "destination": "/index.html" }],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "rolw.app" }],
+      "destination": "https://www.rolw.app/:path*",
+      "permanent": true
+    }
+  ]
 }
