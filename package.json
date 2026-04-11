@@ -1,5 +1,6 @@
 {
   "name": "rolw-web-app",
+  "version": "1.0.1",
   "private": true,
   "description": "ROLW Church static site — no build step"
 }
