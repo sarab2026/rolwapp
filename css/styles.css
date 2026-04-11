@@ -1043,7 +1043,7 @@ a:hover {
 }
 
 .todo-empty-btn:hover {
-  background-color: #daeef1;
+  background-color: rgba(37, 99, 235, 0.08);
 }
 
 .todo-add-form {
@@ -1058,7 +1058,7 @@ a:hover {
   font-family: var(--font-body);
   font-size: 0.85rem;
   color: var(--color-dark-navy);
-  border: 1px solid var(--color-teal);
+  border: 1px solid rgba(30, 64, 175, 0.35);
   border-radius: 6px;
   background-color: var(--color-white);
   transition: border-color 0.2s ease;
@@ -1066,8 +1066,8 @@ a:hover {
 
 .todo-add-input:focus {
   outline: none;
-  border-color: var(--card-accent, var(--color-light-teal));
-  box-shadow: 0 0 0 3px rgba(55, 183, 195, 0.25);
+  border-color: var(--card-accent, #2563EB);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22);
 }
 
 .todo-add-btn {

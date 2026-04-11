@@ -143,11 +143,11 @@ async function loadDonationTotal() {
 }
 
 var CARD_COLORS = [
-  { accent: '#7C3AED', bg: '#F3EEFF' },
-  { accent: '#088395', bg: '#E6F6F8' },
-  { accent: '#BE185D', bg: '#FDF2F8' },
-  { accent: '#B45309', bg: '#FFF8EB' },
-  { accent: '#4338CA', bg: '#EEF0FF' }
+  { accent: '#1E40AF', bg: '#EFF6FF' },
+  { accent: '#0369A1', bg: '#E0F2FE' },
+  { accent: '#1D4ED8', bg: '#DBEAFE' },
+  { accent: '#2563EB', bg: '#EFF6FF' },
+  { accent: '#312E81', bg: '#EEF2FF' }
 ];
 
 async function loadDeptTodoCards(depts) {
