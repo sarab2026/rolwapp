@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ROLW Church - Log In">
+  <title>ROLW Church - Log In</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <div class="signup-page">
+
+    <div class="signup-card">
+      <h1>ROLW Dashboard</h1>
+      <p>Log into your account.</p>
+
+      <form class="signup-form" action="#" method="post">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+
+        <button type="submit" class="btn-signup">Log In</button>
+      </form>
+
+      <p id="form-error" class="form-error"></p>
+      <div id="login-section">
+        <p class="signup-login-link"><a href="#" id="forgot-password-link">Forgot password?</a></p>
+        <p id="reset-message" class="form-error"></p>
+        <p class="signup-login-link">Don't have an account? <a href="index.html">Sign up</a></p>
+      </div>
+
+      <div id="password-recovery-section" class="password-recovery-section" hidden>
+        <h2 class="recovery-heading">Set a new password</h2>
+        <p class="recovery-intro">You opened a password reset link. Enter a new password below, then sign in as usual.</p>
+        <div class="form-group">
+          <label for="new-password">New password</label>
+          <input type="password" id="new-password" name="new-password" autocomplete="new-password" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label for="confirm-new-password">Confirm new password</label>
+          <input type="password" id="confirm-new-password" autocomplete="new-password" required minlength="6">
+        </div>
+        <button type="button" id="save-new-password" class="btn-signup">Save password</button>
+        <p id="recovery-error" class="form-error"></p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/logIn.js"></script>
+
+</body>
+</html>

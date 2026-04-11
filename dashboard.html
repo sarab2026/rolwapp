@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ROLW Church - Welcome to our community">
+  <title>ROLW Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <div class="site-layout">
+
+    <!-- Sidebar Navigation -->
+    <nav class="site-nav">
+      <button class="nav-toggle" aria-label="Toggle navigation">&#9776;</button>
+
+      <div class="nav-brand">
+        <i class="fa-solid fa-church"></i>
+        <span>ROLW Church</span>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <ul class="nav-menu">
+        <li><a href="#" id="nav-home" class="nav-active"><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a href="#" id="nav-calendar"><i class="fa-solid fa-calendar"></i> Calendar</a></li>
+        <li><a href="#"><i class="fa-solid fa-paper-plane"></i> Submit Request</a></li>
+        <li data-role-required="owner,admin"><a href="#" id="nav-database"><i class="fa-solid fa-database"></i> Database</a></li>
+      </ul>
+
+      <div class="nav-bottom">
+        <div class="nav-divider"></div>
+        <a href="#" onclick="signOut(); return false;" class="nav-signout"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="site-content">
+
+      <!-- Weather Bar -->
+      <div class="weather-bar">
+        <div class="weather-widget" id="weather-widget">
+          <span id="weather-icon"></span>
+          <span id="weather-temp"></span>
+          <span class="weather-hilo" id="weather-hilo"></span>
+          <span class="weather-city" id="weather-city"></span>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <main class="site-main">
+        <div class="container">
+
+          <!-- Home Panel (default visible) -->
+          <section id="home-panel">
+            <h2 id="welcome-heading">Welcome</h2>
+            <p class="welcome-subtitle">Here's what's happening at Rivers of Living Waters.</p>
+
+            <div class="dashboard-grid">
+
+              <!-- My Departments Card -->
+              <div class="dash-card dash-card-departments">
+                <div class="dash-card-header">
+                  <i class="fa-solid fa-people-group"></i>
+                  <h4>My Departments</h4>
+                </div>
+                <ul id="departments-list" class="departments-list">
+                  <li class="upcoming-empty">Loading...</li>
+                </ul>
+              </div>
+
+              <!-- Upcoming Events Card -->
+              <div class="dash-card dash-card-events">
+                <div class="dash-card-header">
+                  <i class="fa-solid fa-calendar-day"></i>
+                  <h4>Upcoming Events</h4>
+                </div>
+                <ul id="upcoming-events-list" class="upcoming-events-list">
+                  <li class="upcoming-empty">Loading...</li>
+                </ul>
+              </div>
+
+              <!-- Donation Total Card -->
+              <div class="dash-card dash-card-stat">
+                <div class="dash-card-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                <span class="stat-label">Your Total Donations</span>
+                <span id="donation-total" class="stat-value">$0.00</span>
+              </div>
+
+            </div>
+
+            <div class="dept-todo-section">
+              <h3>Department Tasks</h3>
+              <div id="dept-todo-cards" class="dept-todo-grid"></div>
+            </div>
+          </section>
+
+          <!-- Calendar Panel -->
+          <section id="calendar-panel" style="display: none;">
+            <h2>Calendar</h2>
+            <div class="calendar-header">
+              <button id="cal-prev" class="cal-nav-btn" aria-label="Previous month"><i class="fa-solid fa-chevron-left"></i></button>
+              <h3 id="cal-month-year"></h3>
+              <button id="cal-next" class="cal-nav-btn" aria-label="Next month"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+            <button id="add-event-btn" class="btn-add-event" data-role-required="owner,admin"><i class="fa-solid fa-plus"></i> Add Event</button>
+          </section>
+
+          <!-- Add Event Modal -->
+          <div id="event-modal" class="event-modal" style="display: none;">
+            <div class="event-modal-content">
+              <h3>Add Event</h3>
+              <form id="event-form">
+                <div class="form-group">
+                  <label for="event-title">Event Title</label>
+                  <input type="text" id="event-title" required>
+                </div>
+                <div class="form-group">
+                  <label for="event-date">Date</label>
+                  <input type="date" id="event-date" required>
+                </div>
+                <div class="form-group">
+                  <label for="event-time">Time</label>
+                  <input type="time" id="event-time">
+                </div>
+                <div class="form-group">
+                  <label for="event-description">Description</label>
+                  <textarea id="event-description" rows="3"></textarea>
+                </div>
+                <div class="event-modal-actions">
+                  <button type="submit" class="btn-signup">Save</button>
+                  <button type="button" id="event-modal-cancel" class="btn-cancel">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Event Detail Modal -->
+          <div id="event-detail-modal" class="event-modal" style="display: none;">
+            <div class="event-modal-content">
+              <h3 id="detail-title"></h3>
+              <div class="detail-field">
+                <span class="detail-label">Date</span>
+                <span id="detail-date"></span>
+              </div>
+              <div class="detail-field" id="detail-time-row">
+                <span class="detail-label">Time</span>
+                <span id="detail-time"></span>
+              </div>
+              <div class="detail-field" id="detail-desc-row">
+                <span class="detail-label">Description</span>
+                <p id="detail-description"></p>
+              </div>
+              <div class="event-modal-actions">
+                <button type="button" id="detail-delete-btn" class="btn-cancel" style="background-color: #d9534f; color: #FFFFFF;">Delete</button>
+                <button type="button" id="detail-close-btn" class="btn-cancel">Close</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Database Panel -->
+          <section id="database-panel" style="display: none;" data-role-required="owner,admin">
+            <h2>Users</h2>
+            <div class="table-wrap">
+              <table class="users-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                </tbody>
+              </table>
+            </div>
+
+            <div class="donation-form-wrap" data-role-required="owner">
+              <h3>Add Donation</h3>
+              <form id="donation-form" class="donation-form">
+                <div class="form-group">
+                  <label for="donation-user">User</label>
+                  <select id="donation-user" class="role-select" required></select>
+                </div>
+                <div class="form-group">
+                  <label for="donation-amount">Amount ($)</label>
+                  <input type="number" id="donation-amount" min="0.01" step="0.01" required>
+                </div>
+                <button type="submit" class="btn-add-event">
+                  <i class="fa-solid fa-plus"></i> Add Donation
+                </button>
+              </form>
+              <p id="donation-message" class="donation-message"></p>
+            </div>
+
+            <div class="donation-form-wrap" data-role-required="owner">
+              <h3>Assign Departments</h3>
+              <div class="form-group">
+                <label for="dept-user">User</label>
+                <select id="dept-user" class="role-select" required>
+                  <option value="" disabled selected>Select a user...</option>
+                </select>
+              </div>
+              <div id="dept-checkbox-group" class="dept-checkbox-group"></div>
+              <button type="button" id="dept-save-btn" class="btn-add-event" disabled>
+                <i class="fa-solid fa-floppy-disk"></i> Save Departments
+              </button>
+              <p id="dept-message" class="donation-message"></p>
+            </div>
+          </section>
+
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="site-footer">
+        <div class="container">
+          <p>&copy; 2026 ROLW Church. All rights reserved.</p>
+        </div>
+      </footer>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/weather.js"></script>
+  <script>
+    document.querySelector('.nav-toggle').addEventListener('click', function () {
+      document.querySelector('.site-nav').classList.toggle('open');
+    });
+  </script>
+
+</body>
+</html>
