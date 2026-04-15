@@ -40,6 +40,7 @@ document.addEventListener('authReady', function () {
   loadUpcomingEvents();
   loadDonationTotal();
   loadDepartments();
+  loadDashboardFlyers();
 });
 
 async function loadUpcomingEvents() {
@@ -359,4 +360,190 @@ async function reloadSingleCard(department) {
   if (oldCard) {
     container.replaceChild(newCard, oldCard);
   }
+}
+
+/* --- Dashboard event flyers (Storage + dashboard_flyers) --- */
+var DASHBOARD_FLYERS_BUCKET = 'event-flyers';
+
+function canManageDashboardFlyers() {
+  return typeof hasRole === 'function' && hasRole('owner', 'admin');
+}
+
+function dashboardFlyerPublicUrl(storagePath) {
+  var out = supabaseClient.storage.from(DASHBOARD_FLYERS_BUCKET).getPublicUrl(storagePath);
+  return out.data.publicUrl;
+}
+
+async function loadDashboardFlyers() {
+  var grid = document.getElementById('dashboard-flyers-grid');
+  if (!grid) return;
+
+  var isManager = canManageDashboardFlyers();
+
+  var { data, error } = await supabaseClient
+    .from('dashboard_flyers')
+    .select('id, storage_path, sort_order, created_at')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('dashboard_flyers:', error);
+    var msg = error.message || String(error);
+    var hint = (msg.indexOf('does not exist') !== -1 || msg.indexOf('schema cache') !== -1)
+      ? ' Run supabase/dashboard_flyers_setup.sql in the Supabase SQL editor.'
+      : '';
+    grid.innerHTML = '<p class="dashboard-flyers-empty">Flyers could not be loaded.' + hint + '</p>';
+    return;
+  }
+
+  var rows = data || [];
+  grid.innerHTML = '';
+
+  rows.forEach(function (row) {
+    grid.appendChild(buildDashboardFlyerCard(row, isManager));
+  });
+
+  if (isManager) {
+    grid.appendChild(buildDashboardFlyerBlankCard());
+  } else if (rows.length === 0) {
+    grid.innerHTML = '<p class="dashboard-flyers-empty">No event flyers yet.</p>';
+  }
+}
+
+function buildDashboardFlyerCard(row, isManager) {
+  var card = document.createElement('div');
+  card.className = 'dashboard-flyer-card';
+
+  var img = document.createElement('img');
+  img.className = 'dashboard-flyer-img';
+  img.src = dashboardFlyerPublicUrl(row.storage_path);
+  img.alt = 'Event flyer';
+  img.loading = 'lazy';
+  card.appendChild(img);
+
+  if (isManager) {
+    var del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'dashboard-flyer-delete';
+    del.setAttribute('aria-label', 'Delete flyer');
+    del.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+    del.addEventListener('click', function (e) {
+      e.stopPropagation();
+      deleteDashboardFlyer(row.id, row.storage_path);
+    });
+    card.appendChild(del);
+  }
+
+  return card;
+}
+
+function buildDashboardFlyerBlankCard() {
+  var card = document.createElement('div');
+  card.className = 'dashboard-flyer-card dashboard-flyer-card--blank';
+  card.setAttribute('role', 'button');
+  card.tabIndex = 0;
+  card.setAttribute('aria-label', 'Upload a new flyer image');
+
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.className = 'dashboard-flyer-file-input';
+  input.accept = 'image/jpeg,image/png,image/webp,image/gif';
+  input.setAttribute('aria-hidden', 'true');
+
+  function openPicker() {
+    input.click();
+  }
+
+  card.addEventListener('click', function (e) {
+    if (e.target === input) return;
+    openPicker();
+  });
+  card.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openPicker();
+    }
+  });
+
+  input.addEventListener('change', function () {
+    var f = input.files && input.files[0];
+    input.value = '';
+    if (f) uploadDashboardFlyer(f);
+  });
+
+  var inner = document.createElement('div');
+  inner.className = 'dashboard-flyer-blank-inner';
+  inner.innerHTML = '<i class="fa-solid fa-plus" aria-hidden="true"></i><span>Upload flyer</span>';
+  card.appendChild(inner);
+  card.appendChild(input);
+
+  return card;
+}
+
+async function uploadDashboardFlyer(file) {
+  if (!canManageDashboardFlyers()) return;
+
+  if (!file.type || file.type.indexOf('image/') !== 0) {
+    window.alert('Please choose an image file (JPEG, PNG, WebP, or GIF).');
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    window.alert('Image must be 5 MB or smaller.');
+    return;
+  }
+
+  var rawExt = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  var ext = ['jpg', 'jpeg', 'png', 'webp', 'gif'].indexOf(rawExt) !== -1 ? rawExt : 'jpg';
+  if (ext === 'jpeg') ext = 'jpg';
+
+  var path = 'flyers/' + crypto.randomUUID() + '.' + ext;
+  var contentType = file.type || 'image/jpeg';
+
+  var { error: upErr } = await supabaseClient.storage
+    .from(DASHBOARD_FLYERS_BUCKET)
+    .upload(path, file, { contentType: contentType, upsert: false });
+
+  if (upErr) {
+    window.alert('Upload failed: ' + upErr.message);
+    return;
+  }
+
+  var sortKey = Date.now();
+
+  var { error: insErr } = await supabaseClient
+    .from('dashboard_flyers')
+    .insert({ storage_path: path, sort_order: sortKey });
+
+  if (insErr) {
+    await supabaseClient.storage.from(DASHBOARD_FLYERS_BUCKET).remove([path]);
+    window.alert('Could not save flyer: ' + insErr.message);
+    return;
+  }
+
+  loadDashboardFlyers();
+}
+
+async function deleteDashboardFlyer(id, storagePath) {
+  if (!canManageDashboardFlyers()) return;
+  if (!window.confirm('Remove this flyer from the dashboard?')) return;
+
+  var { error: delRowErr } = await supabaseClient
+    .from('dashboard_flyers')
+    .delete()
+    .eq('id', id);
+
+  if (delRowErr) {
+    window.alert('Could not remove flyer: ' + delRowErr.message);
+    return;
+  }
+
+  var { error: delStErr } = await supabaseClient.storage
+    .from(DASHBOARD_FLYERS_BUCKET)
+    .remove([storagePath]);
+
+  if (delStErr) {
+    console.warn('Storage delete:', delStErr);
+  }
+
+  loadDashboardFlyers();
 }
