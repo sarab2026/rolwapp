@@ -1098,13 +1098,14 @@ a:hover {
 }
 
 .dashboard-flyers-grid {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1.25rem;
+  align-items: start;
 }
 
 .dashboard-flyers-empty {
+  grid-column: 1 / -1;
   color: var(--color-teal);
   font-size: 0.95rem;
   margin: 0;
@@ -1112,17 +1113,16 @@ a:hover {
 
 .dashboard-flyer-card {
   position: relative;
-  flex-shrink: 0;
+  min-width: 0;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(7, 25, 82, 0.12), 0 6px 24px rgba(7, 25, 82, 0.1);
   background-color: var(--color-white);
 }
 
-/* Filled flyer: full image visible (no crop); card grows with image aspect ratio */
+/* Filled flyer: full image visible; card fills its grid column */
 .dashboard-flyer-card:not(.dashboard-flyer-card--blank) {
   width: 100%;
-  max-width: 380px;
 }
 
 .dashboard-flyer-img {
@@ -1155,8 +1155,7 @@ a:hover {
 
 .dashboard-flyer-card--blank {
   width: 100%;
-  max-width: 380px;
-  min-height: 280px;
+  min-height: 260px;
   border: 2px dashed rgba(8, 131, 149, 0.45);
   background-color: rgba(235, 244, 246, 0.9);
   cursor: pointer;
@@ -1254,17 +1253,16 @@ a:hover {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .dashboard-flyers-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .calendar-day {
     min-height: 6rem;
   }
 
-  .dashboard-flyer-card:not(.dashboard-flyer-card--blank) {
-    max-width: 440px;
-  }
-
   .dashboard-flyer-card--blank {
-    max-width: 440px;
-    min-height: 300px;
+    min-height: 280px;
   }
 }
 
@@ -1291,13 +1289,12 @@ a:hover {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .dashboard-flyer-card:not(.dashboard-flyer-card--blank) {
-    max-width: 520px;
+  .dashboard-flyers-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .dashboard-flyer-card--blank {
-    max-width: 520px;
-    min-height: 320px;
+    min-height: 300px;
   }
 
   .calendar-day {
