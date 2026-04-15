@@ -1112,9 +1112,6 @@ a:hover {
 
 .dashboard-flyer-card {
   position: relative;
-  width: 100%;
-  max-width: 200px;
-  aspect-ratio: 3 / 4;
   flex-shrink: 0;
   border-radius: 12px;
   overflow: hidden;
@@ -1122,13 +1119,15 @@ a:hover {
   background-color: var(--color-white);
 }
 
-.dashboard-flyer-img {
-  position: absolute;
-  inset: 0;
+/* Filled flyer: full image visible (no crop); card grows with image aspect ratio */
+.dashboard-flyer-card:not(.dashboard-flyer-card--blank) {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  max-width: 380px;
+}
+
+.dashboard-flyer-img {
+  width: 100%;
+  height: auto;
   display: block;
 }
 
@@ -1155,6 +1154,9 @@ a:hover {
 }
 
 .dashboard-flyer-card--blank {
+  width: 100%;
+  max-width: 380px;
+  min-height: 280px;
   border: 2px dashed rgba(8, 131, 149, 0.45);
   background-color: rgba(235, 244, 246, 0.9);
   cursor: pointer;
@@ -1255,6 +1257,15 @@ a:hover {
   .calendar-day {
     min-height: 6rem;
   }
+
+  .dashboard-flyer-card:not(.dashboard-flyer-card--blank) {
+    max-width: 440px;
+  }
+
+  .dashboard-flyer-card--blank {
+    max-width: 440px;
+    min-height: 300px;
+  }
 }
 
 /* --- Desktop (1024px and up) --- */
@@ -1278,6 +1289,15 @@ a:hover {
 
   .dept-todo-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .dashboard-flyer-card:not(.dashboard-flyer-card--blank) {
+    max-width: 520px;
+  }
+
+  .dashboard-flyer-card--blank {
+    max-width: 520px;
+    min-height: 320px;
   }
 
   .calendar-day {
